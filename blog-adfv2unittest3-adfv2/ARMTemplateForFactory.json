@@ -1,0 +1,47 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "blog-adfv2unittest3-adfv2"
+		},
+		"dataFactory_properties_globalParameters_sqlserver_value": {
+			"type": "string",
+			"defaultValue": "123"
+		},
+		"dataFactory_properties_globalParameters_database_value": {
+			"type": "string",
+			"defaultValue": "456"
+		},
+		"dataFactory_location": {
+			"type": "string",
+			"defaultValue": "westeurope"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[parameters('factoryName')]",
+			"type": "Microsoft.DataFactory/factories",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"globalParameters": {
+					"sqlserver": {
+						"type": "string",
+						"value": "[parameters('dataFactory_properties_globalParameters_sqlserver_value')]"
+					},
+					"database": {
+						"type": "string",
+						"value": "[parameters('dataFactory_properties_globalParameters_database_value')]"
+					}
+				}
+			},
+			"dependsOn": [],
+			"location": "[parameters('dataFactory_location')]"
+		}
+	]
+}

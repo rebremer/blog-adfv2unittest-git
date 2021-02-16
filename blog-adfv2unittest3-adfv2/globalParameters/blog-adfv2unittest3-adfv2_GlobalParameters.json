@@ -1,0 +1,10 @@
+{
+	"sqlserver": {
+		"type": "string",
+		"value": "123"
+	},
+	"database": {
+		"type": "string",
+		"value": "456"
+	}
+}

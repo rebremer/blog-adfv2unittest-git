@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "blog-adfv2unittest3-adfv2"
+		},
+		"dataFactory_properties_globalParameters_sqlserver_value": {
+			"value": "123"
+		},
+		"dataFactory_properties_globalParameters_database_value": {
+			"value": "456"
+		},
+		"dataFactory_location": {
+			"value": "westeurope"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
