@@ -63,7 +63,10 @@
 				"linkedServiceName": {
 					"referenceName": "AzureSqlDatabase1",
 					"type": "LinkedServiceReference",
-					"parameters": {}
+					"parameters": {
+						"sqlserver": "@pipeline().globalParameters.tesafwer",
+						"database": "3ew"
+					}
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
