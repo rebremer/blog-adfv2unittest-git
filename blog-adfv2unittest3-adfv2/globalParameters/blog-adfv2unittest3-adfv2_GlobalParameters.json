@@ -6,5 +6,9 @@
 	"database": {
 		"type": "string",
 		"value": "456"
+	},
+	"tesafwer": {
+		"type": "string",
+		"value": "asdfasdf"
 	}
 }

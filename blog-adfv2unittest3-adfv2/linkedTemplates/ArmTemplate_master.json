@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "blog-adfv2unittest3-adfv2"
 		},
+		"AzureSqlDatabase1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
+		},
 		"dataFactory_properties_globalParameters_sqlserver_value": {
 			"type": "string",
 			"defaultValue": "123"
@@ -14,6 +18,10 @@
 		"dataFactory_properties_globalParameters_database_value": {
 			"type": "string",
 			"defaultValue": "456"
+		},
+		"dataFactory_properties_globalParameters_tesafwer_value": {
+			"type": "string",
+			"defaultValue": "asdfasdf"
 		},
 		"dataFactory_location": {
 			"type": "string",
@@ -46,11 +54,17 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"AzureSqlDatabase1_connectionString": {
+						"value": "[parameters('AzureSqlDatabase1_connectionString')]"
+					},
 					"dataFactory_properties_globalParameters_sqlserver_value": {
 						"value": "[parameters('dataFactory_properties_globalParameters_sqlserver_value')]"
 					},
 					"dataFactory_properties_globalParameters_database_value": {
 						"value": "[parameters('dataFactory_properties_globalParameters_database_value')]"
+					},
+					"dataFactory_properties_globalParameters_tesafwer_value": {
+						"value": "[parameters('dataFactory_properties_globalParameters_tesafwer_value')]"
 					},
 					"dataFactory_location": {
 						"value": "[parameters('dataFactory_location')]"
