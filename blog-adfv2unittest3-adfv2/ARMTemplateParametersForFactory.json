@@ -7,18 +7,6 @@
 		},
 		"AzureSqlDatabase1_connectionString": {
 			"value": ""
-		},
-		"dataFactory_properties_globalParameters_sqlserver_value": {
-			"value": "123"
-		},
-		"dataFactory_properties_globalParameters_database_value": {
-			"value": "456"
-		},
-		"dataFactory_properties_globalParameters_tesafwer_value": {
-			"value": "asdfasdf"
-		},
-		"dataFactory_location": {
-			"value": "westeurope"
 		}
 	}
 }

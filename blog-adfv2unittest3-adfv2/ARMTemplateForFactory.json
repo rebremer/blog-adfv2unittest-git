@@ -10,51 +10,12 @@
 		"AzureSqlDatabase1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
-		},
-		"dataFactory_properties_globalParameters_sqlserver_value": {
-			"type": "string",
-			"defaultValue": "123"
-		},
-		"dataFactory_properties_globalParameters_database_value": {
-			"type": "string",
-			"defaultValue": "456"
-		},
-		"dataFactory_properties_globalParameters_tesafwer_value": {
-			"type": "string",
-			"defaultValue": "asdfasdf"
-		},
-		"dataFactory_location": {
-			"type": "string",
-			"defaultValue": "westeurope"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"parameters": {
-					"sqlserver": {
-						"type": "string"
-					},
-					"database": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('AzureSqlDatabase1_connectionString')]"
-				}
-			},
-			"dependsOn": [
-				"[variables('factoryId')]"
-			]
-		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
@@ -74,32 +35,29 @@
 				"typeProperties": {}
 			},
 			"dependsOn": [
-				"[variables('factoryId')]",
 				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
 			]
 		},
 		{
-			"name": "[parameters('factoryName')]",
-			"type": "Microsoft.DataFactory/factories",
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"globalParameters": {
+				"parameters": {
 					"sqlserver": {
-						"type": "string",
-						"value": "[parameters('dataFactory_properties_globalParameters_sqlserver_value')]"
+						"type": "string"
 					},
 					"database": {
-						"type": "string",
-						"value": "[parameters('dataFactory_properties_globalParameters_database_value')]"
-					},
-					"tesafwer": {
-						"type": "string",
-						"value": "[parameters('dataFactory_properties_globalParameters_tesafwer_value')]"
+						"type": "string"
 					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureSqlDatabase1_connectionString')]"
 				}
 			},
-			"dependsOn": [],
-			"location": "[parameters('dataFactory_location')]"
+			"dependsOn": []
 		}
 	]
 }

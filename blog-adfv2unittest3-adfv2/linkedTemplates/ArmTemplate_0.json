@@ -10,51 +10,12 @@
 		"AzureSqlDatabase1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
-		},
-		"dataFactory_properties_globalParameters_sqlserver_value": {
-			"type": "string",
-			"defaultValue": "123"
-		},
-		"dataFactory_properties_globalParameters_database_value": {
-			"type": "string",
-			"defaultValue": "456"
-		},
-		"dataFactory_properties_globalParameters_tesafwer_value": {
-			"type": "string",
-			"defaultValue": "asdfasdf"
-		},
-		"dataFactory_location": {
-			"type": "string",
-			"defaultValue": "westeurope"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
-		{
-			"name": "[parameters('factoryName')]",
-			"type": "Microsoft.DataFactory/factories",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"globalParameters": {
-					"sqlserver": {
-						"type": "string",
-						"value": "[parameters('dataFactory_properties_globalParameters_sqlserver_value')]"
-					},
-					"database": {
-						"type": "string",
-						"value": "[parameters('dataFactory_properties_globalParameters_database_value')]"
-					},
-					"tesafwer": {
-						"type": "string",
-						"value": "[parameters('dataFactory_properties_globalParameters_tesafwer_value')]"
-					}
-				}
-			},
-			"dependsOn": [],
-			"location": "[parameters('dataFactory_location')]"
-		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
