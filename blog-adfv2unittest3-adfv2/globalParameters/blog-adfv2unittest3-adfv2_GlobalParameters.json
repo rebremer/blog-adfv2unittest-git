@@ -1,14 +1,10 @@
 {
 	"sqlserver": {
 		"type": "string",
-		"value": "123"
+		"value": "blog-adfv2unittest-sql.database.windows.net"
 	},
 	"database": {
 		"type": "string",
-		"value": "456"
-	},
-	"tesafwer": {
-		"type": "string",
-		"value": "asdfasdf"
+		"value": "blog-adfv2unittest-db"
 	}
 }
