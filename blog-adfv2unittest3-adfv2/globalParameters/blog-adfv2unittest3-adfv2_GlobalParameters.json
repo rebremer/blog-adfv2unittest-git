@@ -1,10 +1,10 @@
 {
 	"sqlserver": {
 		"type": "string",
-		"value": "blog-adfv2unittest-sql.database.windows.net"
+		"value": "123"
 	},
 	"database": {
 		"type": "string",
-		"value": "blog-adfv2unittest-db"
+		"value": "456"
 	}
 }
