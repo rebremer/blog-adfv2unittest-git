@@ -154,11 +154,11 @@
 								"datasetParameters": {
 									"source1": {
 										"sqlserver": {
-											"value": "@pipeline().parameters.sqlserver",
+											"value": "@pipeline().globalParameters.sqlserver",
 											"type": "Expression"
 										},
 										"database": {
-											"value": "@pipeline().parameters.database",
+											"value": "@pipeline().globalParameters.database",
 											"type": "Expression"
 										},
 										"schema": "Sales",
@@ -166,11 +166,11 @@
 									},
 									"sink1": {
 										"sqlserver": {
-											"value": "@pipeline().parameters.sqlserver",
+											"value": "@pipeline().globalParameters.sqlserver",
 											"type": "Expression"
 										},
 										"database": {
-											"value": "@pipeline().parameters.database",
+											"value": "@pipeline().globalParameters.database",
 											"type": "Expression"
 										},
 										"schema": "Sales",
@@ -187,16 +187,6 @@
 						}
 					}
 				],
-				"parameters": {
-					"sqlserver": {
-						"type": "string",
-						"defaultValue": "blog-adfv2unittest-sql.database.windows.net"
-					},
-					"database": {
-						"type": "string",
-						"defaultValue": "blog-adfv2unittest-db"
-					}
-				},
 				"annotations": []
 			},
 			"dependsOn": [

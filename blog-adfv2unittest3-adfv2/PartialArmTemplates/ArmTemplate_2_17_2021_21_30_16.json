@@ -1,0 +1,77 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "blog-adfv2unittest3-adfv2"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline-remove-nulls')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dataflow1",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"source1": {
+										"sqlserver": {
+											"value": "@pipeline().globalParameters.sqlserver",
+											"type": "Expression"
+										},
+										"database": {
+											"value": "@pipeline().globalParameters.database",
+											"type": "Expression"
+										},
+										"schema": "Sales",
+										"table": "Orders"
+									},
+									"sink1": {
+										"sqlserver": {
+											"value": "@pipeline().globalParameters.sqlserver",
+											"type": "Expression"
+										},
+										"database": {
+											"value": "@pipeline().globalParameters.database",
+											"type": "Expression"
+										},
+										"schema": "Sales",
+										"table": "Orders"
+									}
+								}
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": []
+		}
+	]
+}
