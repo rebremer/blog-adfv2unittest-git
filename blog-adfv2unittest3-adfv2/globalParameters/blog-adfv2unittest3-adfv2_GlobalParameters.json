@@ -1,7 +1,7 @@
 {
 	"sqlserver": {
 		"type": "string",
-		"value": "blog-adfv2unittest-sql.database.windowsdfs.net"
+		"value": "blog-adfv2unittest-sql.database.windows.net"
 	},
 	"database": {
 		"type": "string",
