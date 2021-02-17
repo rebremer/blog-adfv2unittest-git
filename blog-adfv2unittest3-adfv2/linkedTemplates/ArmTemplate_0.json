@@ -189,10 +189,12 @@
 				],
 				"parameters": {
 					"sqlserver": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "blog-adfv2unittest-sql.database.windows.net"
 					},
 					"database": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "blog-adfv2unittest-db"
 					}
 				},
 				"annotations": []
