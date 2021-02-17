@@ -54,11 +54,11 @@
 									},
 									"sink1": {
 										"sqlserver": {
-											"value": "@pipeline().globalParameters.sqlserver",
+											"value": "@pipeline().parameters.sqlserver",
 											"type": "Expression"
 										},
 										"database": {
-											"value": "@pipeline().globalParameters.database",
+											"value": "@pipeline().parameters.database",
 											"type": "Expression"
 										},
 										"schema": "Sales",
