@@ -1,0 +1,16 @@
+{
+	"name": "blog-adfv2unittest3-adfv2",
+	"properties": {
+		"globalParameters": {
+			"sqlserver": {
+				"type": "string",
+				"value": "blog-adfv2unittest-sql.database.windows.net"
+			},
+			"database": {
+				"type": "string",
+				"value": "blog-adfv2unittest-db"
+			}
+		}
+	},
+	"location": "westeurope"
+}

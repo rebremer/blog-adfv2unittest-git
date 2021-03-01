@@ -1,0 +1,12 @@
+def pytest_addoption(parser):
+    parser.addoption("--tokenadf", action="store", default="default name")
+    parser.addoption("--tokendb", action="store", default="default name")
+    parser.addoption("--adfv2id", action="store", default="default name")
+    parser.addoption("--adfv2name", action="store", default="default name")
+    parser.addoption("--sqlserver", action="store", default="default name")
+    parser.addoption("--sqldatabase", action="store", default="default name")
+    parser.addoption("--sqllogin", action="store", default="default name")
+    parser.addoption("--sqlpassword", action="store", default="default name")
+    parser.addoption("--azuredevopsspndbadmin", action="store", default="default name")
+    parser.addoption("--subscriptionid", action="store", default="default name")
+    parser.addoption("--rg", action="store", default="default name")  
