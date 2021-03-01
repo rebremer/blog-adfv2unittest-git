@@ -10,6 +10,22 @@
 		"AzureSqlDatabase1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
+		},
+		"AzureSqlDatabase2_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase2'"
+		},
+		"dataFactory_properties_globalParameters_sqlserver_value": {
+			"type": "string",
+			"defaultValue": "blog-adfv2unittest-sql.database.windows.net"
+		},
+		"dataFactory_properties_globalParameters_database_value": {
+			"type": "string",
+			"defaultValue": "blog-adfv2unittest-db"
+		},
+		"dataFactory_location": {
+			"type": "string",
+			"defaultValue": "westeurope"
 		}
 	},
 	"variables": {
@@ -24,6 +40,7 @@
 				"activities": [
 					{
 						"name": "Data flow1",
+						"description": "2021-03-01 13:45",
 						"type": "ExecuteDataFlow",
 						"dependsOn": [],
 						"policy": {
@@ -75,9 +92,11 @@
 						}
 					}
 				],
-				"annotations": []
+				"annotations": [],
+				"lastPublishTime": "2021-02-28T14:28:43Z"
 			},
 			"dependsOn": [
+				"[variables('factoryId')]",
 				"[concat(variables('factoryId'), '/dataflows/dataflow1')]"
 			]
 		},
@@ -87,7 +106,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
+					"referenceName": "AzureSqlDatabase2",
 					"type": "LinkedServiceReference",
 					"parameters": {
 						"sqlserver": {
@@ -129,7 +148,8 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+				"[variables('factoryId')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase2')]"
 			]
 		},
 		{
@@ -137,6 +157,7 @@
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "kl123",
 				"parameters": {
 					"sqlserver": {
 						"type": "string"
@@ -151,7 +172,32 @@
 					"connectionString": "[parameters('AzureSqlDatabase1_connectionString')]"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[variables('factoryId')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"sqlserver": {
+						"type": "string"
+					},
+					"database": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureSqlDatabase2_connectionString')]"
+				}
+			},
+			"dependsOn": [
+				"[variables('factoryId')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
@@ -190,8 +236,28 @@
 				}
 			},
 			"dependsOn": [
+				"[variables('factoryId')]",
 				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]"
 			]
+		},
+		{
+			"name": "[parameters('factoryName')]",
+			"type": "Microsoft.DataFactory/factories",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"globalParameters": {
+					"sqlserver": {
+						"type": "string",
+						"value": "[parameters('dataFactory_properties_globalParameters_sqlserver_value')]"
+					},
+					"database": {
+						"type": "string",
+						"value": "[parameters('dataFactory_properties_globalParameters_database_value')]"
+					}
+				}
+			},
+			"dependsOn": [],
+			"location": "[parameters('dataFactory_location')]"
 		}
 	]
 }

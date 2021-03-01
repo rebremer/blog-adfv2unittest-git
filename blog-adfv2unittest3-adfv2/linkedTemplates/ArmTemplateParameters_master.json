@@ -8,6 +8,18 @@
 		"AzureSqlDatabase1_connectionString": {
 			"value": ""
 		},
+		"AzureSqlDatabase2_connectionString": {
+			"value": ""
+		},
+		"dataFactory_properties_globalParameters_sqlserver_value": {
+			"value": "blog-adfv2unittest-sql.database.windows.net"
+		},
+		"dataFactory_properties_globalParameters_database_value": {
+			"value": "blog-adfv2unittest-db"
+		},
+		"dataFactory_location": {
+			"value": "westeurope"
+		},
 		"containerUri": {
 			"value": ""
 		},
