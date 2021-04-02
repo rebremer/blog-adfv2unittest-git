@@ -3,7 +3,7 @@
 # 0. Check whether SQL server was already deployed before (deployment takes ~10 minutes)
 sqlexist=$(az sql server show -n $SQLSERVER -g $RG)
 sqlname=$(jq .name -r <<< "$sqlexist")
-if [ $sqlname = $SQLSERVER ] && [$REDEPLOYSQLDB = 0]; then
+if [[ $sqlname = $SQLSERVER && $REDEPLOYSQLDB = 0 ]]; then
    echo "SQLServer already exists and does not have to be redeployed"
    exit 0
 fi

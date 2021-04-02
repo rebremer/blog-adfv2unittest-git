@@ -1,7 +1,7 @@
 # Create ADLSgen2 account and upload csv data
 #
 # 0. Check whether Storage was already deployed before (deployment takes ~2 minutes)
-if [[] $REDEPLOYADLS = 0 && $REDEPLOYADLS = 0]]; then
+if [[ $REDEPLOYADLS = 0 && $REDEPLOYADLS = 0 ]]; then
    echo "ADLSgen2 storage account already exists and does not have to be redeployed"
    exit 0
 fi
