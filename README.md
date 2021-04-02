@@ -1,4 +1,4 @@
-# Unit testing in Data Factory using Azure DevOps and pytest
+# Data Factory unit test using Azure DevOps and pytest
 *TLTR: Create Azure DevOps pipeline using azure-pipelines.yml, change variables and run ADFv2 unit test*
 
 Project that creates a unit test in Data Factory. Key in this project is the following:
