@@ -52,7 +52,7 @@
 		"parameters": {
 			"outputfolder": {
 				"type": "string",
-				"defaultValue": "bottled"
+				"defaultValue": "curated"
 			}
 		},
 		"annotations": [],
