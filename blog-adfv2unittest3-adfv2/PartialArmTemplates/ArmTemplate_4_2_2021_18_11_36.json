@@ -1,0 +1,82 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "blog-adfv2unittest3-adfv2"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/adlsgen2-dataflows-delete-piicolumns')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "adlsgen2-dataflows-csvparquet",
+						"description": "2021-04-02 17:08",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "adlsgen2removepii",
+								"type": "DataFlowReference",
+								"parameters": {
+									"adlsgen2sinkcontainer": {
+										"value": "'@{pipeline().parameters.outputfolder}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"source1": {
+										"adlsgen2": {
+											"value": "@pipeline().globalParameters.adlsgen2",
+											"type": "Expression"
+										}
+									},
+									"sink1": {
+										"adlsgen2": "@pipeline().globalParameters.adlsgen2",
+										"outputcontainer": {
+											"value": "@pipeline().parameters.outputfolder",
+											"type": "Expression"
+										}
+									}
+								}
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"parameters": {
+					"outputfolder": {
+						"type": "string",
+						"defaultValue": "curated"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-04-02T12:21:14Z"
+			},
+			"dependsOn": [
+				"[variables('factoryId')]"
+			]
+		}
+	]
+}

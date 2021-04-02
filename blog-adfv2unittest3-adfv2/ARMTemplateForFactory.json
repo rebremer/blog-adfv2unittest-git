@@ -48,7 +48,7 @@
 				"activities": [
 					{
 						"name": "adlsgen2-dataflows-csvparquet",
-						"description": "2021-02-28 15:28",
+						"description": "2021-04-02 17:08",
 						"type": "ExecuteDataFlow",
 						"dependsOn": [],
 						"policy": {
@@ -97,7 +97,7 @@
 				"parameters": {
 					"outputfolder": {
 						"type": "string",
-						"defaultValue": "bottled"
+						"defaultValue": "curated"
 					}
 				},
 				"annotations": [],
