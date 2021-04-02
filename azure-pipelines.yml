@@ -20,8 +20,6 @@ variables:
   # 4. Variables to speed up testing
   REDEPLOYSQLDB: 0   # In case REDEPLOYSQLDB = 0 AND $SQLDATABASE is already present in $RG, then it will not be restored again
   REDEPLOYADLS: 0    # In case REDEPLOYALDS = 0 AND $ADLSGEN2STOR is already present in $RG, then it will not be restored again
-  TESTADFV2SQLDB: 1  # In case TESTSQLDBADFV2 = 1, then ADFV2 Pipeline "sqldb-dataflows-removenulls" using SQLDB will be tested in pytest 
-  TESTADFV2ADLS: 1   # In case TESTALDSADFV2 = 1, then ADFV2 Pipeline "adlsgen2-dataflows-csvparquet" using ALDSGEN2 will be tested in pytest
   #
   # 5. Authentication settings
   AZUREDEVOPSSPNDBADMIN: 0
@@ -128,12 +126,7 @@ stages:
               scriptPath: '$(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd/deploymentscripts/1c_create_tmp_tokens_passwords.sh'
           - script: |
               pip install -r pytestscripts/requirements.txt
-              if [ $TESTADFV2SQLDB = 1 ]; then
-                python -m pytest pytestscripts/2a_adfv2pipeline_sqldb.py --rg $(RG) --subscriptionid $(SUBSCRIPTIONID) --tokenadf $(tokenadf) --tokendb $(tokendb) --accesskeyadls $(accesskeyadls) --adfv2id $(adfv2id) --adfv2name $(ADFV2NAME) --sqlserver $(SQLSERVER) --sqldatabase $(SQLDATABASE) --sqllogin '$(SQLLOGIN)' --sqlpassword '$(sqlpassword)' --adlsgen2stor '$(ADLSGEN2STOR)' --azuredevopsspndbadmin $(AZUREDEVOPSSPNDBADMIN) --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
-              fi
-              if [ $TESTADFV2ADLS = 1 ]; then
-                python -m pytest pytestscripts/2b_adfv2pipeline_adls.py --rg $(RG) --subscriptionid $(SUBSCRIPTIONID) --tokenadf $(tokenadf) --tokendb $(tokendb) --accesskeyadls $(accesskeyadls) --adfv2id $(adfv2id) --adfv2name $(ADFV2NAME) --sqlserver $(SQLSERVER) --sqldatabase $(SQLDATABASE) --sqllogin '$(SQLLOGIN)' --sqlpassword '$(sqlpassword)' --adlsgen2stor '$(ADLSGEN2STOR)' --azuredevopsspndbadmin $(AZUREDEVOPSSPNDBADMIN) --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
-              fi
+              python -m pytest pytestscripts --rg $(RG) --subscriptionid $(SUBSCRIPTIONID) --tokenadf $(tokenadf) --tokendb $(tokendb) --accesskeyadls $(accesskeyadls) --adfv2id $(adfv2id) --adfv2name $(ADFV2NAME) --sqlserver $(SQLSERVER) --sqldatabase $(SQLDATABASE) --sqllogin '$(SQLLOGIN)' --sqlpassword '$(sqlpassword)' --adlsgen2stor '$(ADLSGEN2STOR)' --azuredevopsspndbadmin $(AZUREDEVOPSSPNDBADMIN) --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
             displayName: 'Test ADFv2 pipelines with pytest'
             workingDirectory: $(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd
           - task: PublishTestResults@2
