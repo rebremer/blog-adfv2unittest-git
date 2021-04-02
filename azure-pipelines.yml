@@ -111,21 +111,21 @@ stages:
             inputs:
               azureSubscription: $(AzureServiceConnectionId)
               scriptType: bash
-              scriptPath: '$(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd/1a_create_resources_sqldb.sh'
+              scriptPath: '$(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd/deploymentscripts/1a_create_resources_sqldb.sh'
               workingDirectory: $(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd
           - task: AzureCLI@2
             displayName: 'Create ADLSgen2 account and upload csv data'
             inputs:
               azureSubscription: $(AzureServiceConnectionId)
               scriptType: bash
-              scriptPath: '$(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd/1b_create_resources_adlsgen2.sh'
+              scriptPath: '$(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd/deploymentscripts/1b_create_resources_adlsgen2.sh'
               workingDirectory: $(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd
           - task: AzureCLI@2
             displayName: 'Create tmp tokens and passwords'
             inputs:
               azureSubscription: $(AzureServiceConnectionId)
               scriptType: bash
-              scriptPath: '$(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd/1c_create_tmp_tokens_passwords.sh'
+              scriptPath: '$(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd/deploymentscripts/1c_create_tmp_tokens_passwords.sh'
           - script: |
               pip install -r pytestscripts/requirements.txt
               if [ $TESTADFV2SQLDB = 1 ]; then
