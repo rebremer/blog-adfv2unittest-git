@@ -25,7 +25,6 @@ def test_run_pipeline(pytestconfig):
 	# https://docs.microsoft.com/en-us/samples/azure-samples/data-lake-analytics-python-auth-options/authenticating-your-python-application-against-azure-active-directory/
 	# access_token = credentials.token["access_token"]
 	tokendb = pytestconfig.getoption('tokendb')
-	adfv2id = pytestconfig.getoption('adfv2id')
 	adfv2name = pytestconfig.getoption('adfv2name')
 	sqlserver = pytestconfig.getoption('sqlserver') + '.database.windows.net'
 	sqldatabase = pytestconfig.getoption('sqldatabase')
@@ -34,30 +33,10 @@ def test_run_pipeline(pytestconfig):
 	azuredevopsspndbadmin = pytestconfig.getoption('azuredevopsspndbadmin')
 	subscriptionid = pytestconfig.getoption('subscriptionid')
 	rg = pytestconfig.getoption('rg')
-	if azuredevopsspndbadmin == 1:
-		# Azure DevOPs is SQL Azure AD admin and ADFv2 MI shall be added to database as user
-		accessToken = bytes(tokendb, 'utf-8')
-		exptoken = b""
-		for i in accessToken:
-			exptoken += bytes({i})
-			exptoken += bytes(1)
-		tokenstruct = struct.pack("=i", len(exptoken)) + exptoken
-		connstr = 'DRIVER={ODBC Driver 17 for SQL Server};SERVER='+sqlserver+';DATABASE='+sqldatabase
-		conn = pyodbc.connect(connstr, attrs_before = { 1256:tokenstruct })
-		cursor = conn.cursor()
-		#
-		create_user ="CREATE USER [" + adfv2name + "] FROM EXTERNAL PROVIDER;"
-		cursor.execute(create_user)
-		add_role = "EXEC sp_addrolemember [db_owner], [" + adfv2name + "];"
-		cursor.execute(add_role)	
-	else:
-		# ADFv2 MI is Azure AD admin, SQL local user shall be used to query results database from Azure DevOps
-		connstr = 'DRIVER={ODBC Driver 17 for SQL Server};SERVER='+sqlserver+';UID='+sqllogin+';PWD='+sqlpassword+';DATABASE='+sqldatabase
-		conn = pyodbc.connect(connstr)
-		cursor = conn.cursor()
-	 #
+	#
+	# Since Azure DevOps SPN created ADFv2 instance, Azure DevOps SPN has owner rights and can execute pipelin using REST (Contributor is minimally required)
 	tokenadf = pytestconfig.getoption('tokenadf')
-	adfv2namepipeline = "pipeline-remove-nulls"
+	adfv2namepipeline = "sqldb-dataflows-remove-nullvalues"
 	url = "https://management.azure.com/subscriptions/{}/resourceGroups/{}/providers/Microsoft.DataFactory/factories/{}/pipelines/{}/createRun?api-version=2018-06-01".format(subscriptionid, rg, adfv2name, adfv2namepipeline)
 	response = requests.post(url, 
 		headers={'Authorization': "Bearer " + tokenadf},
@@ -89,6 +68,27 @@ def test_run_pipeline(pytestconfig):
 	#
 	assert count <30, "test failed, time out"
 	#
+	if azuredevopsspndbadmin == 1:
+		# Azure DevOPs is SQL Azure AD admin and ADFv2 MI shall be added to database as user
+		accessToken = bytes(tokendb, 'utf-8')
+		exptoken = b""
+		for i in accessToken:
+			exptoken += bytes({i})
+			exptoken += bytes(1)
+		tokenstruct = struct.pack("=i", len(exptoken)) + exptoken
+		connstr = 'DRIVER={ODBC Driver 17 for SQL Server};SERVER='+sqlserver+';DATABASE='+sqldatabase
+		conn = pyodbc.connect(connstr, attrs_before = { 1256:tokenstruct })
+		cursor = conn.cursor()
+		#
+		create_user ="CREATE USER [" + adfv2name + "] FROM EXTERNAL PROVIDER;"
+		cursor.execute(create_user)
+		add_role = "EXEC sp_addrolemember [db_owner], [" + adfv2name + "];"
+		cursor.execute(add_role)	
+	else:
+		# ADFv2 MI is Azure AD admin, SQL local user shall be used to query results database from Azure DevOps
+		connstr = 'DRIVER={ODBC Driver 17 for SQL Server};SERVER='+sqlserver+';UID='+sqllogin+';PWD='+sqlpassword+';DATABASE='+sqldatabase
+		conn = pyodbc.connect(connstr)
+		cursor = conn.cursor()
 	cursor.execute("SELECT count(*) FROM Sales.OrdersAggregated WHERE Comments != 'test123'")
 	row = cursor.fetchall()
 	value = [record[0] for record in row]

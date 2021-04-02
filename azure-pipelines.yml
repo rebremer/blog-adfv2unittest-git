@@ -1,22 +1,42 @@
 variables:
-  # Azure DevOps settings
-  AzureServiceConnectionId: '<<your Azure DevOps SPN>>'
-  # Change environment variables used in bash scripts with your own
-  RG: '<<your resource group>>'
-  # fixed Environment variables, no need for unique values
-  LOC: '<<your Azure region>>'
-  ADFV2NAME: '<<your Azure Data Factory name>>'
-  SUBSCRIPTIONID: '<<your subscription id>>'
-  BACPACFILE: 'WideWorldImporters-Standard.bacpac'
-  SQLSERVER: '<<your sqlserver name, without .database.windows.net>>'
-  SQLDATABASE: '<<your database name>>'
-  SQLSERVICEOBJECTIVE: 'BC_Gen5_2'
-  # In case AZURE_DEVOPS_SPN_DB_ADMIN = 0 (without _), then ADFv2 MI becomes SQLDB AAD admin 
-  # Local SQL user will be used by pytest to query database state and thus is not necessary to have directory reader rights. 
-  # Notice that in a production situation, ADFv2 MI should never be SQLDB Admin.
-  # In case AZURE_DEVOPS_SPN_DB_ADMIN = 1 (without _), then Azure DevOps SPN is SQLDB AAD admin and ADFv2 MI is addes as external user
-  # To do this, Azure DevOps SPN needs to have directory reader rights, see  https://docs.microsoft.com/en-us/azure/azure-sql/database/authentication-aad-service-principal
+  #
+  # 1. Azure DevOps settings, change with your own
+  AzureServiceConnectionId: '<<Your Azure DevOps Service Connection>>'
+  SUBSCRIPTIONID: '<<Your Subscription ID>>'
+  #
+  # 2. Unique environment variables,change it with your own
+  ADLSGEN2STOR: '<<Your ADLSgen2 storage account, globally unique>>'
+  SQLSERVER: '<<Your SQL server name, globally unique>>'
+  #
+  # 3. Fixed Environment variables, no need for unique values
+  RG: 'blog-adfv2unittest-rg'
+  LOC: 'westeurope'
+  ADFV2NAME: 'blog-adfv2unittest-deployadfv2'
+  BACPACFILE: 'OrdersDatabase.bacpac'
+  SQLDATABASE: 'blog-adfv2unittest-db'
+  SQLSERVICEOBJECTIVE: 'S0'
+  SQLLOGIN: 'blogadfv2sqluser'
+  #
+  # 4. Variables to speed up testing
+  REDEPLOYSQLDB: 0   # In case REDEPLOYSQLDB = 0 AND $SQLDATABASE is already present in $RG, then it will not be restored again
+  REDEPLOYADLS: 0    # In case REDEPLOYALDS = 0 AND $ADLSGEN2STOR is already present in $RG, then it will not be restored again
+  TESTADFV2SQLDB: 1  # In case TESTSQLDBADFV2 = 1, then ADFV2 Pipeline "sqldb-dataflows-removenulls" using SQLDB will be tested in pytest 
+  TESTADFV2ADLS: 1   # In case TESTALDSADFV2 = 1, then ADFV2 Pipeline "adlsgen2-dataflows-csvparquet" using ALDSGEN2 will be tested in pytest
+  #
+  # 5. Authentication settings
   AZUREDEVOPSSPNDBADMIN: 0
+  # In case AZUREDEVOPSSPNDBADMIN = 1 (preferred option), then 
+  # - Azure DevOps SPN will become SQLDB AAD admin. Authentication scheme to SQLDB is then as follows:
+  #   1. Azure DevOps SPN adds ADFv2 MI as external user to SQLDB and is used by ADFv2 pipeline to read/write data to SQLDB. Notice:
+  #     - !!! IMPORTANT!!! Azure DevOps SPN can only add ADFv2 MI to SQLDB as external user if it has directory reader rights, see https://docs.microsoft.com/en-us/azure/azure-sql/database/authentication-aad-service-principal
+  #   2. Azure DevOps SPN will query results in pytest after ADFv2 pipeline has run to validate results
+  # 
+  # In case AZURE_DEVOPS_SPN_DB_ADMIN = 0, then 
+  # - ADFv2 MI will become SQLDB AAD admin. Authentication scheme to SQLDB is then as follows:
+  #   1. ADFv2 MI will be used by ADFv2 pipeline to read/write data to SQLDB. Notice:
+  #     - ADFv2 MI is admin of the database which does not reflect a production situation where ADFv2 typically has read/write access to a limited set of tables
+  #   2. SQL user/password authentication will query results in pytest after ADFv2 pipeline has run to validate results
+  # AZURE_DEVOPS_SPN_DB_ADMIN = 1 is the prefered solution in production, but not always possible due to elevated rights. AZURE_DEVOPS_SPN_DB_ADMIN = 0 is fallback for testing
 trigger:
 - master
 
@@ -85,28 +105,36 @@ stages:
               location: $(LOC)
               csmFile: '$(Pipeline.Workspace)/drop/blog-adfv2unittest-deployadfv2/blog-adfv2unittest3-adfv2/ARMTemplateForFactory.json'
               csmParametersFile: '$(Pipeline.Workspace)/drop/blog-adfv2unittest-deployadfv2/blog-adfv2unittest3-adfv2/ARMTemplateParametersForFactory.json'
-              overrideParameters: "-factoryName $(ADFV2NAME) -AzureSqlDatabase2_connectionString \"Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().sqlserver};Initial Catalog=@{linkedService().database}\" -dataFactory_properties_globalParameters_sqlserver_value $(SQLSERVER).database.windows.net -dataFactory_properties_globalParameters_database_value $(SQLDATABASE)"
-              #overrideParameters: "-factoryName $(ADFV2) -dataFactory_properties_globalParameters_akv_url_value $(akv_url) -dataFactory_properties_globalParameters_stor_url_value $(stor_url) -dataFactory_properties_globalParameters_stor_name_value $(STOR) -dataFactory_properties_globalParameters_cosmosdb_name_value $(COSMOSDBNAME) -dataFactory_properties_globalParameters_dbr_resource_id_value $(dbr_resource_id) -dataFactory_properties_globalParameters_workspace_id_url_value $(workspace_id_url) -dataFactory_properties_globalParameters_cluster_id_value $(cluster_id) -dataFactory_properties_globalParameters_vaultBaseUrl_value $(akv_url) -dataFactory_location $(LOC) -dataFactory_properties_globalParameters_notebook_name_value /insert_data_CosmosDB_Gremlin.py"
+              overrideParameters: "-factoryName $(ADFV2NAME) -AzureSqlDatabase2_connectionString \"Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().sqlserver};Initial Catalog=@{linkedService().database}\" -dataFactory_properties_globalParameters_sqlserver_value $(SQLSERVER).database.windows.net -dataFactory_properties_globalParameters_database_value $(SQLDATABASE) -dataFactory_properties_globalParameters_adlsgen2_value https://$(ADLSGEN2STOR).dfs.core.windows.net -dataFactory_location $(LOC)"
           - task: AzureCLI@2
-            displayName: 'Create resources'
+            displayName: 'Create SQL database and restore BACPAC'
             inputs:
               azureSubscription: $(AzureServiceConnectionId)
               scriptType: bash
-              scriptPath: '$(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd/1_create_resources.sh'
+              scriptPath: '$(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd/1a_create_resources_sqldb.sh'
+              workingDirectory: $(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd
           - task: AzureCLI@2
-            displayName: 'Create bearer token'
+            displayName: 'Create ADLSgen2 account and upload csv data'
             inputs:
               azureSubscription: $(AzureServiceConnectionId)
               scriptType: bash
-              scriptPath: '$(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd/2_create_tokens.sh'
+              scriptPath: '$(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd/1b_create_resources_adlsgen2.sh'
+              workingDirectory: $(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd
+          - task: AzureCLI@2
+            displayName: 'Create tmp tokens and passwords'
+            inputs:
+              azureSubscription: $(AzureServiceConnectionId)
+              scriptType: bash
+              scriptPath: '$(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd/1c_create_tmp_tokens_passwords.sh'
           - script: |
-              pip install pytest
-              pip install pytest-cov
-              pip install msrestazure
-              pip install adal
-              pip install pyodbc
-              python -m pytest tests --rg $(RG) --subscriptionid $(SUBSCRIPTIONID) --tokenadf $(tokenadf) --tokendb $(tokendb) --adfv2id $(adfv2id) --adfv2name $(ADFV2NAME) --sqlserver $(SQLSERVER) --sqldatabase $(SQLDATABASE) --sqllogin '$(sqllogin)' --sqlpassword '$(sqlpassword)' --azuredevopsspndbadmin $(AZUREDEVOPSSPNDBADMIN) --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
-            displayName: 'Test with pytest'
+              pip install -r pytestscripts/requirements.txt
+              if [ $TESTADFV2SQLDB = 1 ]; then
+                python -m pytest pytestscripts/2a_adfv2pipeline_sqldb.py --rg $(RG) --subscriptionid $(SUBSCRIPTIONID) --tokenadf $(tokenadf) --tokendb $(tokendb) --accesskeyadls $(accesskeyadls) --adfv2id $(adfv2id) --adfv2name $(ADFV2NAME) --sqlserver $(SQLSERVER) --sqldatabase $(SQLDATABASE) --sqllogin '$(SQLLOGIN)' --sqlpassword '$(sqlpassword)' --adlsgen2stor '$(ADLSGEN2STOR)' --azuredevopsspndbadmin $(AZUREDEVOPSSPNDBADMIN) --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
+              fi
+              if [ $TESTADFV2ADLS = 1 ]; then
+                python -m pytest pytestscripts/2b_adfv2pipeline_adls.py --rg $(RG) --subscriptionid $(SUBSCRIPTIONID) --tokenadf $(tokenadf) --tokendb $(tokendb) --accesskeyadls $(accesskeyadls) --adfv2id $(adfv2id) --adfv2name $(ADFV2NAME) --sqlserver $(SQLSERVER) --sqldatabase $(SQLDATABASE) --sqllogin '$(SQLLOGIN)' --sqlpassword '$(sqlpassword)' --adlsgen2stor '$(ADLSGEN2STOR)' --azuredevopsspndbadmin $(AZUREDEVOPSSPNDBADMIN) --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
+              fi
+            displayName: 'Test ADFv2 pipelines with pytest'
             workingDirectory: $(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd
           - task: PublishTestResults@2
             condition: succeededOrFailed()
