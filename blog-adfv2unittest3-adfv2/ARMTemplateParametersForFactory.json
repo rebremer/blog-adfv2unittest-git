@@ -5,11 +5,11 @@
 		"factoryName": {
 			"value": "blog-adfv2unittest3-adfv2"
 		},
-		"AzureSqlDatabase1_connectionString": {
-			"value": ""
-		},
 		"AzureSqlDatabase2_connectionString": {
 			"value": ""
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "@{linkedService().adlsgen2}"
 		},
 		"dataFactory_properties_globalParameters_sqlserver_value": {
 			"value": "blog-adfv2unittest-sql.database.windows.net"
@@ -17,8 +17,14 @@
 		"dataFactory_properties_globalParameters_database_value": {
 			"value": "blog-adfv2unittest-db"
 		},
+		"dataFactory_properties_globalParameters_adlsgen2_value": {
+			"value": "https://blogadfv2unittestadls.dfs.core.windows.net"
+		},
 		"dataFactory_location": {
 			"value": "westeurope"
+		},
+		"dataFactory_identity_type": {
+			"value": "SystemAssigned"
 		}
 	}
 }

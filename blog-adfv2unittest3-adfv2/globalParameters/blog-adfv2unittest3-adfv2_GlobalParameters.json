@@ -6,5 +6,9 @@
 	"database": {
 		"type": "string",
 		"value": "blog-adfv2unittest-db"
+	},
+	"adlsgen2": {
+		"type": "string",
+		"value": "https://blogadfv2unittestadls.dfs.core.windows.net"
 	}
 }

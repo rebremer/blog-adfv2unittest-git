@@ -7,13 +7,13 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "blog-adfv2unittest3-adfv2"
 		},
-		"AzureSqlDatabase1_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
-		},
 		"AzureSqlDatabase2_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase2'"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{linkedService().adlsgen2}"
 		},
 		"dataFactory_properties_globalParameters_sqlserver_value": {
 			"type": "string",
@@ -23,9 +23,17 @@
 			"type": "string",
 			"defaultValue": "blog-adfv2unittest-db"
 		},
+		"dataFactory_properties_globalParameters_adlsgen2_value": {
+			"type": "string",
+			"defaultValue": "https://blogadfv2unittestadls.dfs.core.windows.net"
+		},
 		"dataFactory_location": {
 			"type": "string",
 			"defaultValue": "westeurope"
+		},
+		"dataFactory_identity_type": {
+			"type": "string",
+			"defaultValue": "SystemAssigned"
 		}
 	},
 	"variables": {
@@ -33,14 +41,14 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/pipeline-remove-nulls')]",
+			"name": "[concat(parameters('factoryName'), '/adlsgen2-dataflows-delete-piicolumns')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "Data flow1",
-						"description": "2021-03-01 14:00",
+						"name": "adlsgen2-dataflows-csvparquet",
+						"description": "2021-02-28 15:28",
 						"type": "ExecuteDataFlow",
 						"dependsOn": [],
 						"policy": {
@@ -53,7 +61,75 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataflow": {
-								"referenceName": "dataflow1",
+								"referenceName": "adlsgen2removepii",
+								"type": "DataFlowReference",
+								"parameters": {
+									"adlsgen2sinkcontainer": {
+										"value": "'@{pipeline().parameters.outputfolder}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"source1": {
+										"adlsgen2": {
+											"value": "@pipeline().globalParameters.adlsgen2",
+											"type": "Expression"
+										}
+									},
+									"sink1": {
+										"adlsgen2": "@pipeline().globalParameters.adlsgen2",
+										"outputcontainer": {
+											"value": "@pipeline().parameters.outputfolder",
+											"type": "Expression"
+										}
+									}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"parameters": {
+					"outputfolder": {
+						"type": "string",
+						"defaultValue": "bottled"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-04-02T12:21:14Z"
+			},
+			"dependsOn": [
+				"[variables('factoryId')]",
+				"[concat(variables('factoryId'), '/dataflows/adlsgen2removepii')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sqldb-dataflows-remove-nullvalues')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "SQLDB dataflows remove nulls",
+						"description": "2021-03-29 15:28",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "sqldbremovenulls",
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
@@ -93,11 +169,94 @@
 					}
 				],
 				"annotations": [],
-				"lastPublishTime": "2021-02-28T14:28:43Z"
+				"lastPublishTime": "2021-04-02T12:21:14Z"
 			},
 			"dependsOn": [
 				"[variables('factoryId')]",
-				"[concat(variables('factoryId'), '/dataflows/dataflow1')]"
+				"[concat(variables('factoryId'), '/dataflows/sqldbremovenulls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ADLSgen2CSV')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"adlsgen2": {
+							"value": "@dataset().adlsgen2",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"adlsgen2": {
+						"type": "string",
+						"defaultValue": "https://blogadfv2unittestadls.dfs.core.windows.net"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "raw"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[variables('factoryId')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ADLSgen2Parquet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"adlsgen2": {
+							"value": "@dataset().adlsgen2",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"adlsgen2": {
+						"type": "string",
+						"defaultValue": "https://blogadfv2unittestadls.dfs.core.windows.net"
+					},
+					"outputcontainer": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": {
+							"value": "@dataset().outputcontainer",
+							"type": "Expression"
+						}
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[variables('factoryId')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
 			]
 		},
 		{
@@ -153,23 +312,20 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
+			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "kl123",
 				"parameters": {
-					"sqlserver": {
-						"type": "string"
-					},
-					"database": {
-						"type": "string"
+					"adlsgen2": {
+						"type": "string",
+						"defaultValue": "https://blogadfv2unittestadls.dfs.core.windows.net"
 					}
 				},
 				"annotations": [],
-				"type": "AzureSqlDatabase",
+				"type": "AzureBlobFS",
 				"typeProperties": {
-					"connectionString": "[parameters('AzureSqlDatabase1_connectionString')]"
+					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
 				}
 			},
 			"dependsOn": [
@@ -200,7 +356,46 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
+			"name": "[concat(parameters('factoryName'), '/adlsgen2removepii')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ADLSgen2CSV",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ADLSgen2Parquet",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "Select1"
+						}
+					],
+					"script": "parameters{\n\tadlsgen2sinkcontainer as string ('bottled')\n}\nsource(output(\n\t\tage as short,\n\t\t{ workclass} as string,\n\t\t{ fnlwgt} as integer,\n\t\t{ education} as string,\n\t\t{ education-num} as short,\n\t\t{ marital-status} as string,\n\t\t{ occupation} as string,\n\t\t{ relationship} as string,\n\t\t{ race} as string,\n\t\t{ sex} as string,\n\t\t{ capital-gain} as integer,\n\t\t{ capital-loss} as short,\n\t\t{ hours-per-week} as short,\n\t\t{ native-country} as string,\n\t\t{ income} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource1 select(mapColumn(\n\t\t{ workclass},\n\t\t{ fnlwgt},\n\t\t{ education},\n\t\t{ education-num},\n\t\t{ marital-status},\n\t\t{ occupation},\n\t\t{ relationship},\n\t\t{ sex},\n\t\t{ capital-gain},\n\t\t{ capital-loss},\n\t\t{ hours-per-week},\n\t\t{ native-country},\n\t\t{ income}\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nSelect1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionFileNames:['AdultCensusIncomePIIremoved.parquet'],\n\tmapColumn(\n\t\tworkclass = { workclass},\n\t\tfnlwgt = { fnlwgt},\n\t\teducation = { education},\n\t\t{education-num} = { education-num},\n\t\t{marital-status} = { marital-status},\n\t\toccupation = { occupation},\n\t\trelationship = { relationship},\n\t\tsex = { sex},\n\t\t{capital-gain} = { capital-gain},\n\t\t{capital-loss} = { capital-loss},\n\t\t{hours-per-week} = { hours-per-week},\n\t\t{native-country} = { native-country},\n\t\tincome = { income}\n\t),\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
+				}
+			},
+			"dependsOn": [
+				"[variables('factoryId')]",
+				"[concat(variables('factoryId'), '/datasets/ADLSgen2CSV')]",
+				"[concat(variables('factoryId'), '/datasets/ADLSgen2Parquet')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sqldbremovenulls')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -232,7 +427,7 @@
 							"name": "AlterRow1"
 						}
 					],
-					"script": "source(output(\n\t\tOrderID as integer,\n\t\tCustomerID as integer,\n\t\tSalespersonPersonID as integer,\n\t\tPickedByPersonID as integer,\n\t\tContactPersonID as integer,\n\t\tBackorderOrderID as integer,\n\t\tOrderDate as date,\n\t\tExpectedDeliveryDate as date,\n\t\tCustomerPurchaseOrderNumber as string,\n\t\tIsUndersupplyBackordered as boolean,\n\t\tComments as string,\n\t\tDeliveryInstructions as string,\n\t\tInternalComments as string,\n\t\tPickingCompletedWhen as timestamp,\n\t\tLastEditedBy as integer,\n\t\tLastEditedWhen as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> source1\nsource1 derive(Comments = iifNull(Comments, 'test123')) ~> DerivedColumn1\nDerivedColumn1 alterRow(insertIf(true())) ~> AlterRow1\nAlterRow1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
+					"script": "source(output(\n\t\tOrderID as integer,\n\t\tCustomerID as integer,\n\t\tSalespersonPersonID as integer,\n\t\tPickedByPersonID as integer,\n\t\tContactPersonID as integer,\n\t\tBackorderOrderID as integer,\n\t\tOrderDate as date,\n\t\tExpectedDeliveryDate as date,\n\t\tCustomerPurchaseOrderNumber as string,\n\t\tIsUndersupplyBackordered as boolean,\n\t\tComments as string,\n\t\tDeliveryInstructions as string,\n\t\tInternalComments as string,\n\t\tPickingCompletedWhen as timestamp,\n\t\tLastEditedBy as integer,\n\t\tLastEditedWhen as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> source1\nsource1 derive(Comments = iifNull(Comments, 'test123')) ~> DerivedColumn1\nDerivedColumn1 alterRow(insertIf(true())) ~> AlterRow1\nAlterRow1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
 				}
 			},
 			"dependsOn": [
@@ -253,11 +448,18 @@
 					"database": {
 						"type": "string",
 						"value": "[parameters('dataFactory_properties_globalParameters_database_value')]"
+					},
+					"adlsgen2": {
+						"type": "string",
+						"value": "[parameters('dataFactory_properties_globalParameters_adlsgen2_value')]"
 					}
 				}
 			},
 			"dependsOn": [],
-			"location": "[parameters('dataFactory_location')]"
+			"location": "[parameters('dataFactory_location')]",
+			"identity": {
+				"type": "[parameters('dataFactory_identity_type')]"
+			}
 		}
 	]
 }

@@ -7,13 +7,13 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "blog-adfv2unittest3-adfv2"
 		},
-		"AzureSqlDatabase1_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
-		},
 		"AzureSqlDatabase2_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase2'"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{linkedService().adlsgen2}"
 		},
 		"dataFactory_properties_globalParameters_sqlserver_value": {
 			"type": "string",
@@ -23,9 +23,17 @@
 			"type": "string",
 			"defaultValue": "blog-adfv2unittest-db"
 		},
+		"dataFactory_properties_globalParameters_adlsgen2_value": {
+			"type": "string",
+			"defaultValue": "https://blogadfv2unittestadls.dfs.core.windows.net"
+		},
 		"dataFactory_location": {
 			"type": "string",
 			"defaultValue": "westeurope"
+		},
+		"dataFactory_identity_type": {
+			"type": "string",
+			"defaultValue": "SystemAssigned"
 		},
 		"containerUri": {
 			"type": "string",
@@ -54,9 +62,6 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"AzureSqlDatabase1_connectionString": {
-						"value": "[parameters('AzureSqlDatabase1_connectionString')]"
-					},
 					"AzureSqlDatabase2_connectionString": {
 						"value": "[parameters('AzureSqlDatabase2_connectionString')]"
 					},
@@ -66,8 +71,17 @@
 					"dataFactory_properties_globalParameters_database_value": {
 						"value": "[parameters('dataFactory_properties_globalParameters_database_value')]"
 					},
+					"dataFactory_properties_globalParameters_adlsgen2_value": {
+						"value": "[parameters('dataFactory_properties_globalParameters_adlsgen2_value')]"
+					},
 					"dataFactory_location": {
 						"value": "[parameters('dataFactory_location')]"
+					},
+					"dataFactory_identity_type": {
+						"value": "[parameters('dataFactory_identity_type')]"
+					},
+					"AzureDataLakeStorage1_properties_typeProperties_url": {
+						"value": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
 					}
 				}
 			},
