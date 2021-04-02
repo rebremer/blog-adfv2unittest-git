@@ -1,0 +1,62 @@
+{
+	"name": "adlsgen2-dataflows-delete-piicolumns",
+	"properties": {
+		"activities": [
+			{
+				"name": "adlsgen2-dataflows-csvparquet",
+				"description": "2021-02-28 15:28",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "adlsgen2removepii",
+						"type": "DataFlowReference",
+						"parameters": {
+							"adlsgen2sinkcontainer": {
+								"value": "'@{pipeline().parameters.outputfolder}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"source1": {
+								"adlsgen2": {
+									"value": "@pipeline().globalParameters.adlsgen2",
+									"type": "Expression"
+								}
+							},
+							"sink1": {
+								"adlsgen2": "@pipeline().globalParameters.adlsgen2",
+								"outputcontainer": {
+									"value": "@pipeline().parameters.outputfolder",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"parameters": {
+			"outputfolder": {
+				"type": "string",
+				"defaultValue": "bottled"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-04-02T12:21:14Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,35 @@
+{
+	"name": "sqldbremovenulls",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DerivedColumn1"
+				},
+				{
+					"name": "AlterRow1"
+				}
+			],
+			"script": "source(output(\n\t\tOrderID as integer,\n\t\tCustomerID as integer,\n\t\tSalespersonPersonID as integer,\n\t\tPickedByPersonID as integer,\n\t\tContactPersonID as integer,\n\t\tBackorderOrderID as integer,\n\t\tOrderDate as date,\n\t\tExpectedDeliveryDate as date,\n\t\tCustomerPurchaseOrderNumber as string,\n\t\tIsUndersupplyBackordered as boolean,\n\t\tComments as string,\n\t\tDeliveryInstructions as string,\n\t\tInternalComments as string,\n\t\tPickingCompletedWhen as timestamp,\n\t\tLastEditedBy as integer,\n\t\tLastEditedWhen as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> source1\nsource1 derive(Comments = iifNull(Comments, 'test123')) ~> DerivedColumn1\nDerivedColumn1 alterRow(insertIf(true())) ~> AlterRow1\nAlterRow1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\trecreate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
+		}
+	}
+}

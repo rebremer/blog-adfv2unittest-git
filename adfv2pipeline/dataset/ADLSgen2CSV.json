@@ -1,0 +1,35 @@
+{
+	"name": "ADLSgen2CSV",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"adlsgen2": {
+					"value": "@dataset().adlsgen2",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"adlsgen2": {
+				"type": "string",
+				"defaultValue": "https://blogadfv2unittestadls.dfs.core.windows.net"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "raw"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

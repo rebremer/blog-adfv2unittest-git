@@ -1,0 +1,61 @@
+{
+	"name": "sqldb-dataflows-remove-nullvalues",
+	"properties": {
+		"activities": [
+			{
+				"name": "SQLDB dataflows remove nulls",
+				"description": "2021-03-29 15:28",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "sqldbremovenulls",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"source1": {
+								"sqlserver": {
+									"value": "@pipeline().globalParameters.sqlserver",
+									"type": "Expression"
+								},
+								"database": {
+									"value": "@pipeline().globalParameters.database",
+									"type": "Expression"
+								},
+								"schema": "Sales",
+								"table": "Orders"
+							},
+							"sink1": {
+								"sqlserver": {
+									"value": "@pipeline().globalParameters.sqlserver",
+									"type": "Expression"
+								},
+								"database": {
+									"value": "@pipeline().globalParameters.database",
+									"type": "Expression"
+								},
+								"schema": "Sales",
+								"table": "OrdersAggregated"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2021-04-02T12:21:14Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

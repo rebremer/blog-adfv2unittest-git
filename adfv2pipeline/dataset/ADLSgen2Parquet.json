@@ -1,0 +1,38 @@
+{
+	"name": "ADLSgen2Parquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"adlsgen2": {
+					"value": "@dataset().adlsgen2",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"adlsgen2": {
+				"type": "string",
+				"defaultValue": "https://blogadfv2unittestadls.dfs.core.windows.net"
+			},
+			"outputcontainer": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": {
+					"value": "@dataset().outputcontainer",
+					"type": "Expression"
+				}
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

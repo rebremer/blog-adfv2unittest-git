@@ -1,0 +1,32 @@
+{
+	"name": "adlsgen2removepii",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ADLSgen2CSV",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ADLSgen2Parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Select1"
+				}
+			],
+			"script": "parameters{\n\tadlsgen2sinkcontainer as string ('bottled')\n}\nsource(output(\n\t\tage as short,\n\t\t{ workclass} as string,\n\t\t{ fnlwgt} as integer,\n\t\t{ education} as string,\n\t\t{ education-num} as short,\n\t\t{ marital-status} as string,\n\t\t{ occupation} as string,\n\t\t{ relationship} as string,\n\t\t{ race} as string,\n\t\t{ sex} as string,\n\t\t{ capital-gain} as integer,\n\t\t{ capital-loss} as short,\n\t\t{ hours-per-week} as short,\n\t\t{ native-country} as string,\n\t\t{ income} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource1 select(mapColumn(\n\t\t{ workclass},\n\t\t{ fnlwgt},\n\t\t{ education},\n\t\t{ education-num},\n\t\t{ marital-status},\n\t\t{ occupation},\n\t\t{ relationship},\n\t\t{ sex},\n\t\t{ capital-gain},\n\t\t{ capital-loss},\n\t\t{ hours-per-week},\n\t\t{ native-country},\n\t\t{ income}\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nSelect1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionFileNames:['AdultCensusIncomePIIremoved.parquet'],\n\tmapColumn(\n\t\tworkclass = { workclass},\n\t\tfnlwgt = { fnlwgt},\n\t\teducation = { education},\n\t\t{education-num} = { education-num},\n\t\t{marital-status} = { marital-status},\n\t\toccupation = { occupation},\n\t\trelationship = { relationship},\n\t\tsex = { sex},\n\t\t{capital-gain} = { capital-gain},\n\t\t{capital-loss} = { capital-loss},\n\t\t{hours-per-week} = { hours-per-week},\n\t\t{native-country} = { native-country},\n\t\tincome = { income}\n\t),\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
+		}
+	}
+}
