@@ -27,7 +27,7 @@ class CustomTokenCredential(object):
 def name(pytestconfig):
     return pytestconfig.getoption("token")
 
-def test_run_pipeline(pytestconfig):
+def test_adfv2_dataflows_adlsgen2_delete_piicolumns(pytestconfig):
 
 	# https://docs.microsoft.com/en-us/samples/azure-samples/data-lake-analytics-python-auth-options/authenticating-your-python-application-against-azure-active-directory/
 	# access_token = credentials.token["access_token"]

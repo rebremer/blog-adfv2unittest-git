@@ -1,4 +1,4 @@
-# Data Factory unit test using Azure DevOps and pytest
+# Data Factory unit testing using Azure DevOps and pytest
 *TLTR: Create Azure DevOps pipeline using azure-pipelines.yml, change variables and run ADFv2 unit test*
 
 Project that creates a unit test in Data Factory. Key in this project is the following:
@@ -75,7 +75,8 @@ az role assignment list --resource-group <<resource group name>>
 ### 0.4 Configure and build/release YAML pipeline
 
 Go to your Azure DevOps project, select Pipelines and then click “New pipeline”. Go to the wizard, select the Azure Repos Git and the git repo you created earlier. In the tab configure, choose “Existing Azure Pipelines YAML file” and then azure-pipelines.yml that can be found in the git repo, see also below.
-C2.1. In pipeline Configure wizard, select Existing Azure Pipelines YAML file, image by author
+
+![azure_yaml_pipeline](pictures/azure_yaml_pipeline.png)
 
 Subsequently, the following variables need to be substituted with your own values:
 
@@ -91,7 +92,7 @@ Once the variables are substituted, the pipeline is created and run immediatelly
 
 ![Architecture](pictures/run_pipelines.png)
 
-## 1. Deploy ADFv2, SQLDB and ADLSgen2 using Azure DevOps
+## 1. Verification 1: Check whehter ADFv2, SQLDB and ADLSgen2 are deployed
 
 In the first step of the Azure DevOps pipeline, ADFv2, SQLDB and ADLSgen2 are deployed. After deployment is done, it can be verified using Azure CLI whether all resources are deployed.
 
@@ -99,7 +100,7 @@ In the first step of the Azure DevOps pipeline, ADFv2, SQLDB and ADLSgen2 are de
 az resource list -g <<your resource group>>
 ```
 
-## 2. Run ADFv2 using pytest. The following pipelines are executed:
+## 2. Verification 2: Check test results and ADFv2 pipeline runs
 
 In the second step of the Azure DevOps pipeline, two ADFv2 pipelines are deployed. It can be verified in the ADFv2 monitor tab whether both pipelines were executed. In the pytest results, it can be verified whether the tests were successful. The following tests are executed for both pipelines:
 
@@ -112,3 +113,11 @@ In the second step of the Azure DevOps pipeline, two ADFv2 pipelines are deploye
   - Check whether not time out occured in pipeline
   - Check whether file AdultCensusIncomePIIremoved.parquet can be found in curated file system of ADLSgen2
   - Check whether PII sensitive age column was removed from parquet file
+
+Results can be verified in Azure DevOps in the test tab, see below
+
+![Azure DevOps test results](pictures/test_results.png)
+
+The tests can also be verified in monitor tab of data factory, see below.
+
+![Azure Data Factory](pictures/ADFv2_runs.png)
