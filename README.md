@@ -1,10 +1,13 @@
-# Data Factory unit testing using Azure DevOps and pytest
-*TLTR: Create Azure DevOps pipeline using azure-pipelines.yml, change variables and run ADFv2 unit test*
+# Data Factory unit testing using Azure DevOps and pytest.
 
-Project that creates a unit test in Data Factory. Key in this project is the following:
+*TLTR: Create Azure DevOps project using azure-pipelines.yml, create build artifact, deploy ADFv2, SQLDB bacpac, run pytest to do unit tests on ADFv2*
 
-- In unit testing it is important to limit external dependencies and to standardize input/output data. 
+Project that creates a unit test in Data Factory. Key in this project is the following (see also my [blog](https://rebremer.medium.com/how-to-build-unit-tests-for-azure-data-factory-3aa11b36c7af)):
+
+- In unit testing, it is important that tests are isolated and external dependencies are limitied
   - In this project, a bacpac file is restored to a SQLDB and a csv file is added to the storage account as part of the deployment process. This way the input/output data can be controlled.
+- In unit testing it is important that tests are repeatable and self-checking without manual interaction. 
+  - In this project, Azure DevOps and pytest are leveraged. 
 - In unit testing it is also important to focus tests on (complex) business logic rather than testing standard algorithms or third party libaries.
   - In this project, business logic in Dataflows is tested by checking input/output data using pytest
 
@@ -16,7 +19,7 @@ The following steps will be executed:
    - ADFv2 pipeline that removes null values in SQLDB table 
    - ADFv2 pipeline that deletes PII columns and converts csv2parquet in ADLSgen2.
 
-See also picture bleow
+See also picture below
 
 ![Architecture](pictures/pytestadfv2unittest.png)
 
@@ -44,7 +47,7 @@ az group create -n <<your resource group>> -l <<your location>>
 
 ### 0.2 Create Azure DevOps project
 
-Azure DevOps is the tool to continuously build, test, and deploy your code to any platform and cloud. Create a new project in Azure DevOps by following ![this](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops&tabs=preview-page&viewFallbackFrom=vsts) tutorial. Once you create a new project, click on the repository folder and select to import the following repository:
+Azure DevOps is the tool to continuously build, test, and deploy your code to any platform and cloud. Create a new project in Azure DevOps by following [this](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops&tabs=preview-page&viewFallbackFrom=vsts) tutorial. Once you create a new project, click on the repository folder and select to import the following repository:
 
 - https://github.com/rebremer/blog-adfv2unittest-git
 
