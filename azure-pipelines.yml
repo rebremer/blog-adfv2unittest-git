@@ -126,7 +126,7 @@ stages:
               scriptPath: '$(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd/deploymentscripts/1c_create_tmp_tokens_passwords.sh'
           - script: |
               pip install -r pytestscripts/requirements.txt
-              python -m pytest pytestscripts --rg $(RG) --subscriptionid $(SUBSCRIPTIONID) --tokenadf $(tokenadf) --tokendb $(tokendb) --accesskeyadls $(accesskeyadls) --adfv2id $(adfv2id) --adfv2name $(ADFV2NAME) --sqlserver $(SQLSERVER) --sqldatabase $(SQLDATABASE) --sqllogin '$(SQLLOGIN)' --sqlpassword '$(sqlpassword)' --adlsgen2stor '$(ADLSGEN2STOR)' --azuredevopsspndbadmin $(AZUREDEVOPSSPNDBADMIN) --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
+              python -m pytest pytestscripts -n 2 --rg $(RG) --subscriptionid $(SUBSCRIPTIONID) --tokenadf $(tokenadf) --tokendb $(tokendb) --accesskeyadls $(accesskeyadls) --adfv2id $(adfv2id) --adfv2name $(ADFV2NAME) --sqlserver $(SQLSERVER) --sqldatabase $(SQLDATABASE) --sqllogin '$(SQLLOGIN)' --sqlpassword '$(sqlpassword)' --adlsgen2stor '$(ADLSGEN2STOR)' --azuredevopsspndbadmin $(AZUREDEVOPSSPNDBADMIN) --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
             displayName: 'Test ADFv2 pipelines with pytest'
             workingDirectory: $(Pipeline.Workspace)/drop/blog-adfv2unittest-cicd
           - task: PublishTestResults@2
