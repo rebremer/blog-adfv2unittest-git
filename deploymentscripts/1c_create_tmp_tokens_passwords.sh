@@ -6,7 +6,7 @@ echo "##vso[task.setvariable variable=tokendb]$tokendb"
 #echo "##vso[task.setvariable variable=tokenadls]$tokenadls"
 # Datafactory
 az extension add --name datafactory
-api_response=$(az datafactory factory show -n $ADFV2NAME -g $RG)
+api_response=$(az datafactory show -n $ADFV2NAME -g $RG)
 adfv2id=$(jq .identity.principalId -r <<< "$api_response")
 echo "##vso[task.setvariable variable=adfv2id]$adfv2id"
 # SQLDB
