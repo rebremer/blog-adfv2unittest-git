@@ -33,7 +33,7 @@ else
     # ADFv2 SPN as SQL AAD admin
     echo "add ADFv2 MI as SQL AAD admin"
     az extension add --name datafactory
-    api_response=$(az datafactory factory show -n $ADFV2NAME -g $RG)
+    api_response=$(az datafactory show -n $ADFV2NAME -g $RG)
     adfv2id=$(jq .identity.principalId -r <<< "$api_response")
     az sql server ad-admin create -u $ADFV2NAME -i $adfv2id -g $RG -s $SQLSERVER
 fi
