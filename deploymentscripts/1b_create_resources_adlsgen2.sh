@@ -16,7 +16,7 @@ az storage blob upload -f "data/AdultCensusIncome.csv" -c "raw" -n "AdultCensusI
 az storage container create --account-name $ADLSGEN2STOR -n "curated"
 # 4. Grant ADFv2 MI access to storage account
 az extension add --name datafactory
-api_response=$(az datafactory factory show -n $ADFV2NAME -g $RG)
+api_response=$(az datafactory show -n $ADFV2NAME -g $RG)
 adfv2_id=$(jq .identity.principalId -r <<< "$api_response")
 # Assign RBAC rights ADFv2 MI on storage account. 
 # Service connection SPN needs to have owner rights on account
